@@ -11,6 +11,11 @@ para identificar enfermedades en hojas de cultivos de tomate, papa y pimiento.
 - Data augmentation: rotación, flip horizontal, brillo/contraste
 - 10 épocas de entrenamiento, ~62s por época (GPU T4)
 
+## Demo interactiva
+
+Probá el modelo en vivo (subí una foto o usá la cámara):
+[plant-disease-demo](https://huggingface.co/spaces/JoelVela/plant-disease-demo)
+
 ![Resultados de entrenamiento](grafico_entrenamiento.png)
 
 ## Matriz de Confusión
