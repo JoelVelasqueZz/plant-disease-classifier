@@ -20,7 +20,7 @@ Una enfermedad no detectada a tiempo puede propagarse y arruinar una cosecha com
 
 ## Demo interactiva
 
-Probá el modelo en vivo (subí una foto o usá la cámara):
+Prouebe el modelo en vivo (suba una foto o use la cámara):
 [plant-disease-demo](https://huggingface.co/spaces/JoelVela/plant-disease-demo)
 
 ![Resultados de entrenamiento](grafico_entrenamiento.png)
