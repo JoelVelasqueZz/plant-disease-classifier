@@ -11,10 +11,11 @@ Una enfermedad no detectada a tiempo puede propagarse y arruinar una cosecha com
 
 ## Resultados
 
-- **Precisión en validación: 98.33%**
+- **Precisión en validación: 97.94% (con class weights para balanceo de clases)**
 - Dataset: [PlantVillage](https://www.kaggle.com/datasets/emmarex/plantdisease) (20,638 imágenes, 15 clases)
 - Arquitectura: ResNet18 preentrenado (ImageNet), fine-tuning de `layer4` + capa final
 - Data augmentation: rotación, flip horizontal, brillo/contraste
+- Class weights para compensar desbalance entre clases
 - 10 épocas de entrenamiento, ~62s por época (GPU T4)
 
 ## Demo interactiva
@@ -37,13 +38,14 @@ Probá el modelo en vivo (subí una foto o usá la cámara):
 15 clases de hojas (tomate, papa, pimiento), sanas y con distintas enfermedades:
 - Bacterial spot, Early/Late blight, Leaf Mold, Septoria leaf spot, Spider mites, Target Spot, Yellow Leaf Curl Virus, Mosaic virus
 
-**Nota sobre desbalance de clases:** el dataset presenta desbalance entre clases (ej. Tomato YellowLeaf Curl Virus tiene 638 imágenes en validación vs. Tomato Mosaic Virus con 77). Esto puede afectar el aprendizaje, favoreciendo clases con más datos. Compensar este desbalance mediante class weights o técnicas de oversampling es una mejora pendiente.
+**Nota sobre desbalance de clases:** el dataset presenta desbalance entre clases (ej. Tomato YellowLeaf Curl Virus tiene ~8x más imágenes que Tomato Mosaic Virus). Se compensó mediante class weights inversamente proporcionales al tamaño de cada clase, mejorando significativamente el F1-score de clases minoritarias (ej. Tomato_Early_blight: de 0.66 a 0.94).
 
 ## Tecnologías
 
 - Python, PyTorch, torchvision
-- Transfer Learning con ResNet18 (fine-tuning)
-- Data Augmentation
+- Transfer Learning con ResNet18 (fine-tuning de layer4)
+- Data Augmentation (rotación, flip, brillo/contraste)
+- Class Weights para balanceo de clases
 - Google Colab (GPU T4)
 - scikit-learn, matplotlib, seaborn
 
@@ -70,25 +72,44 @@ controladas. Para evaluar generalización real, se probó el modelo con
   notablemente (Prueba 2: 62.1%), y la Prueba 1 (97.8%) podría corresponder 
   a una confusión con Septoria leaf spot, enfermedad visualmente similar.
 
-**Conclusión:** el alto accuracy en validación (98.33%) refleja el 
-desempeño bajo condiciones similares al dataset de entrenamiento. La 
-confianza del modelo varía según la claridad del patrón y la similitud 
-con las condiciones de PlantVillage, lo cual es un punto de mejora para 
-trabajo futuro (ej. incluir imágenes de campo real como PlantDoc).
+**Conclusión:** el alto accuracy en validación refleja el desempeño bajo 
+condiciones similares al dataset de entrenamiento. La confianza del modelo 
+varía según la claridad del patrón y la similitud con las condiciones de 
+PlantVillage, lo cual es un punto de mejora para trabajo futuro 
+(ej. incluir imágenes de campo real como PlantDoc).
+
+## Evolución del modelo
+
+| Experimento | Val Accuracy | Macro F1 |
+|---|---|---|
+| Transfer Learning básico (sin augmentation) | 88.44% | 0.88 |
+| Fine-tuning + augmentation | 97.84% - 98.33% | 0.97 |
+| Fine-tuning + augmentation + class weights | **97.94%** | **0.97** |
+
+La mejora más significativa con class weights no está en el accuracy general 
+sino en las clases minoritarias:
+
+| Clase | F1 sin class weights | F1 con class weights |
+|---|---|---|
+| Tomato_Early_blight | 0.66 | **0.94** |
+| Tomato__Target_Spot | 0.80 | **0.96** |
+| Tomato__Tomato_mosaic_virus | 0.89 | **0.97** |
+| Potato___healthy | 0.91 | **0.92** |
 
 ## Conclusiones
 
-- El modelo alcanzó **98.33% de precisión** combinando fine-tuning de 
-  `layer4` con data augmentation, una mejora significativa frente al 
-  88.44% inicial (solo última capa entrenable, sin augmentation).
+- El modelo alcanzó **97.94% de precisión** combinando fine-tuning de 
+  `layer4`, data augmentation y class weights para compensar el desbalance 
+  de clases.
+- La mejora más importante con class weights fue en **Tomato_Early_blight** 
+  (F1: 0.66 → 0.94), que era la clase más problemática por su similitud 
+  visual con Late_blight y Septoria.
 - Las pruebas con imágenes externas revelaron buen desempeño en casos 
   visualmente claros, pero menor confianza en casos ambiguos o con 
   fondos complejos.
-- El dataset presenta desbalance de clases, lo cual es una limitación 
-  conocida y una línea de mejora futura mediante class weights o oversampling.
 - Posibles mejoras futuras: incluir imágenes de campo real (dataset 
-  PlantDoc), compensar desbalance de clases, probar ResNet50, y empaquetar 
-  el modelo para uso móvil offline (TorchScript / ONNX).
+  PlantDoc), probar ResNet50, y empaquetar el modelo para uso móvil 
+  offline (TorchScript / ONNX).
 
 ### Aplicación práctica
 
