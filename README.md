@@ -3,6 +3,12 @@
 Proyecto de clasificación de imágenes usando **PyTorch** y **Transfer Learning** (ResNet18), 
 para identificar enfermedades en hojas de cultivos de tomate, papa y pimiento.
 
+## Motivación y contexto
+
+Ecuador cuenta con más de 3,000 hectáreas de tomate y producción significativa de pimiento y papa, con concentraciones importantes en provincias como Loja y El Oro. En estas zonas predomina la **agricultura familiar campesina**, donde el MAG registra cerca de 3,900 productores activos que cultivan entre 0.5 y 5 hectáreas, sin acceso inmediato a un agrónomo para diagnosticar enfermedades.
+
+Una enfermedad no detectada a tiempo puede propagarse y arruinar una cosecha completa. Este proyecto busca ser una **herramienta de primer diagnóstico accesible desde el celular**, permitiendo a agricultores de estas zonas identificar enfermedades tempranas y actuar antes de que se propaguen, sin necesidad de conectividad permanente ni expertos disponibles.
+
 ## Resultados
 
 - **Precisión en validación: 98.33%**
@@ -10,6 +16,11 @@ para identificar enfermedades en hojas de cultivos de tomate, papa y pimiento.
 - Arquitectura: ResNet18 preentrenado (ImageNet), fine-tuning de `layer4` + capa final
 - Data augmentation: rotación, flip horizontal, brillo/contraste
 - 10 épocas de entrenamiento, ~62s por época (GPU T4)
+
+## Demo interactiva
+
+Probá el modelo en vivo (subí una foto o usá la cámara):
+[plant-disease-demo](https://huggingface.co/spaces/JoelVela/plant-disease-demo)
 
 ![Resultados de entrenamiento](grafico_entrenamiento.png)
 
@@ -25,6 +36,8 @@ para identificar enfermedades en hojas de cultivos de tomate, papa y pimiento.
 
 15 clases de hojas (tomate, papa, pimiento), sanas y con distintas enfermedades:
 - Bacterial spot, Early/Late blight, Leaf Mold, Septoria leaf spot, Spider mites, Target Spot, Yellow Leaf Curl Virus, Mosaic virus
+
+**Nota sobre desbalance de clases:** el dataset presenta desbalance entre clases (ej. Tomato YellowLeaf Curl Virus tiene 638 imágenes en validación vs. Tomato Mosaic Virus con 77). Esto puede afectar el aprendizaje, favoreciendo clases con más datos. Compensar este desbalance mediante class weights o técnicas de oversampling es una mejora pendiente.
 
 ## Tecnologías
 
@@ -71,16 +84,21 @@ trabajo futuro (ej. incluir imágenes de campo real como PlantDoc).
 - Las pruebas con imágenes externas revelaron buen desempeño en casos 
   visualmente claros, pero menor confianza en casos ambiguos o con 
   fondos complejos.
+- El dataset presenta desbalance de clases, lo cual es una limitación 
+  conocida y una línea de mejora futura mediante class weights o oversampling.
 - Posibles mejoras futuras: incluir imágenes de campo real (dataset 
-  PlantDoc), probar ResNet50, y desarrollar una demo interactiva con 
-  Gradio en Hugging Face Spaces.
+  PlantDoc), compensar desbalance de clases, probar ResNet50, y empaquetar 
+  el modelo para uso móvil offline (TorchScript / ONNX).
 
 ### Aplicación práctica
+
 Este tipo de modelo podría integrarse en una aplicación móvil que permita
-a pequeños agricultores tomar una foto de una hoja y recibir un diagnóstico
-preliminar, facilitando la detección temprana de enfermedades en cultivos. 
+a pequeños agricultores de zonas como Loja y El Oro (Ecuador) tomar una foto 
+de una hoja y recibir un diagnóstico preliminar, facilitando la detección 
+temprana de enfermedades en cultivos de tomate, papa y pimiento.
 Para uso en campo real sería necesario entrenar con imágenes en condiciones 
-similares a las del usuario final.
+similares a las del usuario final, y considerar inferencia offline para zonas 
+con conectividad limitada.
 
 ## Autor
 
